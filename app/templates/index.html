@@ -11,7 +11,16 @@
     <section class="card" aria-labelledby="page-title">
       <p class="eyebrow">Phase 7</p>
       <h1 id="page-title">Commit Quest Daily Check-in</h1>
-      <p>Your daily quests will appear here.</p>
+      <p>Complete these four quests each day to earn 100 XP.</p>
+
+      <ul class="quest-list">
+        {% for quest in quests %}
+          <li class="quest-item">
+            <span class="quest-title">{{ quest.title }}</span>
+            <span class="quest-xp">{{ quest.xp }} XP</span>
+          </li>
+        {% endfor %}
+      </ul>
     </section>
   </main>
 </body>
