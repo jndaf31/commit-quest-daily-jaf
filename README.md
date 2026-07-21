@@ -25,6 +25,35 @@ This application is being built as Phase 7 of João's VPS and networking mentors
 
 Full Commit Quest synchronization will be evaluated after the daily check-in application is complete, deployed, backed up, monitored, and understood.
 
+## Local development
+
+Create a virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Install the development dependencies:
+
+```bash
+python -m pip install -r requirements-dev.txt
+```
+
+Run the tests:
+
+```bash
+pytest
+```
+
+Run the development server:
+
+```bash
+flask --app app:create_app run
+```
+
+Then open `http://127.0.0.1:5000`.
+
 ## Development workflow
 
 - Work from a focused GitHub issue.
