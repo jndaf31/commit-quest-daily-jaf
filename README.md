@@ -4,6 +4,12 @@ A small mobile-first daily checklist inspired by Commit Quest. Completing daily 
 
 This application is being built as Phase 7 of João's VPS and networking mentorship. The first version will use Python, Flask, server-rendered HTML, minimal JavaScript, SQLite, and the Europe/Lisbon time zone.
 
+## Current state
+
+The home page renders four fixed daily quests defined in Python. Each quest has a stable identifier, a title, and an XP reward. The current four quests total 100 XP per day.
+
+Task completion, XP persistence, history, SQLite, health monitoring, and VPS deployment have not been added yet.
+
 ## Initial scope
 
 - One user.
