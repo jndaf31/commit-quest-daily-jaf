@@ -1,6 +1,6 @@
 # Commit Quest Daily Check-in
 
-A small mobile-first daily checklist inspired by Commit Quest. Completing daily tasks awards XP, builds a completion history, and will persist progress in SQLite.
+A small mobile-first daily checklist inspired by Commit Quest. Completing daily tasks awards XP and stores progress in SQLite.
 
 This application is being built as Phase 7 of João's VPS and networking mentorship. The first version uses Python, Flask, server-rendered HTML, minimal JavaScript, SQLite, and the Europe/Lisbon time zone.
 
@@ -8,9 +8,11 @@ This application is being built as Phase 7 of João's VPS and networking mentors
 
 The home page renders four fixed daily quests defined in Python. Each quest has a stable identifier, a title, and an XP reward. The current four quests total 100 XP.
 
-Quests can now be completed through HTML forms. The server calculates total XP, current level, and progress toward the next level. Completion is temporarily held in a Python `set` inside the running Flask application, so it resets whenever the application process restarts or a new application instance is created.
+Quest completions are stored in SQLite. Each record contains a quest ID, a Europe/Lisbon completion date, and a UTC timestamp. A database uniqueness constraint ensures that each quest awards XP only once per Lisbon calendar day. Completion survives application restarts, while a new Lisbon day begins with an incomplete daily checklist.
 
-SQLite persistence, daily date boundaries, history, health monitoring, and VPS deployment have not been added yet.
+The server calculates total XP, current level, and progress toward the next level from today's stored records. State-changing forms require a same-origin request.
+
+History views, health monitoring, deployment configuration, and VPS deployment have not been added yet.
 
 ## Initial scope
 
@@ -63,6 +65,8 @@ flask --app app:create_app run
 ```
 
 Then open `http://127.0.0.1:5000`.
+
+The development database is created automatically as `instance/commit-quest.db`. Flask's instance directory is ignored by Git and is intended for local runtime data rather than source code.
 
 ## Development workflow
 

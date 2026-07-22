@@ -1,8 +1,15 @@
+from collections.abc import Callable
+from datetime import UTC, datetime
+from pathlib import Path
 from urllib.parse import urlsplit
+from zoneinfo import ZoneInfo
 
-from flask import Flask, abort, redirect, render_template, request, url_for
+from flask import Flask, abort, current_app, redirect, render_template, request, url_for
 
+from app.db import get_completed_quest_ids, init_app as init_database, record_completion
 from app.quests import QUESTS
+
+LISBON_TIME_ZONE = ZoneInfo("Europe/Lisbon")
 
 
 def request_has_same_origin() -> bool:
@@ -19,12 +26,32 @@ def request_has_same_origin() -> bool:
     )
 
 
-def create_app() -> Flask:
-    app = Flask(__name__)
-    completed_quest_ids: set[str] = set()
+def current_time() -> datetime:
+    provider: Callable[[], datetime] = current_app.config["NOW_PROVIDER"]
+    return provider()
+
+
+def current_lisbon_date() -> str:
+    return current_time().astimezone(LISBON_TIME_ZONE).date().isoformat()
+
+
+def create_app(test_config: dict | None = None) -> Flask:
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_mapping(
+        DATABASE=Path(app.instance_path) / "commit-quest.db",
+        NOW_PROVIDER=lambda: datetime.now(UTC),
+    )
+
+    if test_config is not None:
+        app.config.update(test_config)
+
+    Path(app.instance_path).mkdir(parents=True, exist_ok=True)
+    init_database(app)
 
     @app.get("/")
     def index() -> str:
+        completion_date = current_lisbon_date()
+        completed_quest_ids = get_completed_quest_ids(completion_date)
         total_xp = sum(
             quest["xp"] for quest in QUESTS if quest["id"] in completed_quest_ids
         )
@@ -50,7 +77,11 @@ def create_app() -> Flask:
         if not request_has_same_origin():
             abort(403)
 
-        completed_quest_ids.add(quest_id)
+        now = current_time()
+        completion_date = now.astimezone(LISBON_TIME_ZONE).date().isoformat()
+        completed_at_utc = now.astimezone(UTC).isoformat()
+        record_completion(quest_id, completion_date, completed_at_utc)
+
         return redirect(url_for("index"))
 
     return app

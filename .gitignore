@@ -61,8 +61,15 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
-# Flask stuff:
+# Flask runtime data and SQLite sidecar files
 instance/
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-shm
+*.sqlite3-wal
+*.db-journal
+*.db-shm
+*.db-wal
 .webassets-cache
 
 # Scrapy stuff:
@@ -104,7 +111,7 @@ ipython_config.py
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
 #   This is especially recommended for binary packages to ensure reproducibility, and is more
 #   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+#   https://python-poetry.org/docs/basic-usage/#poetrylock-file-in-version-control
 # poetry.lock
 # poetry.toml
 
