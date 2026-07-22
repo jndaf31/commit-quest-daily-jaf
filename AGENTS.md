@@ -22,7 +22,8 @@ Do not add public authentication, registration, multiple accounts, third-party A
 
 ## Teaching and implementation rules
 
-- João is a programming and server-administration beginner working primarily from an iPhone.
+- João is a programming and server-administration beginner working primarily from an Apple silicon MacBook. Prefer local repositories, a native editor and terminal, project-specific Python environments, and local tests.
+- The iPhone with Termius remains a secondary VPS access and tested recovery path during the Mac migration. GitHub Codespaces is an optional fallback rather than the default programming environment.
 - Explain each new programming concept and important syntax before expecting João to use it.
 - Use small, focused issues and beginner-readable changes.
 - Do not introduce frameworks, abstractions, dependencies, or patterns without a concrete need.
