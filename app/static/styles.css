@@ -12,6 +12,10 @@ body {
   min-height: 100vh;
 }
 
+a {
+  color: inherit;
+}
+
 button {
   min-height: 2.75rem;
   padding: 0.625rem 1rem;
@@ -34,6 +38,24 @@ button {
   padding: 1.5rem;
   border: 1px solid currentColor;
   border-radius: 1rem;
+}
+
+.page-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-nav a {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+}
+
+.page-nav a[aria-current="page"] {
+  text-decoration-thickness: 0.2rem;
+  text-underline-offset: 0.35rem;
 }
 
 .eyebrow {
@@ -74,12 +96,16 @@ h1 {
   font-weight: 700;
 }
 
+.quest-list,
+.history-quests {
+  padding: 0;
+  list-style: none;
+}
+
 .quest-list {
   display: grid;
   gap: 0.75rem;
   margin: 1.5rem 0 0;
-  padding: 0;
-  list-style: none;
 }
 
 .quest-item {
@@ -90,7 +116,9 @@ h1 {
   border-radius: 0.75rem;
 }
 
-.quest-item > div {
+.quest-item > div,
+.history-quests li,
+.history-day__heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -113,6 +141,41 @@ h1 {
 
 .completion-status {
   font-weight: 700;
+}
+
+.history-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.history-day {
+  padding: 1rem;
+  border: 1px solid currentColor;
+  border-radius: 0.75rem;
+}
+
+.history-day h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.history-quests {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+}
+
+.history-quests li {
+  padding-top: 0.5rem;
+  border-top: 1px solid currentColor;
+}
+
+.empty-state {
+  margin: 1.5rem 0 0;
+  padding: 1rem;
+  border: 1px dashed currentColor;
+  border-radius: 0.75rem;
 }
 
 p:last-child {
