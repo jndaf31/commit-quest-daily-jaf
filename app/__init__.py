@@ -1,6 +1,22 @@
-from flask import Flask, abort, redirect, render_template, url_for
+from urllib.parse import urlsplit
+
+from flask import Flask, abort, redirect, render_template, request, url_for
 
 from app.quests import QUESTS
+
+
+def request_has_same_origin() -> bool:
+    origin = request.headers.get("Origin")
+
+    if origin is None:
+        return False
+
+    parsed_origin = urlsplit(origin)
+
+    return (
+        parsed_origin.scheme in {"http", "https"}
+        and parsed_origin.netloc.casefold() == request.host.casefold()
+    )
 
 
 def create_app() -> Flask:
@@ -30,6 +46,9 @@ def create_app() -> Flask:
 
         if quest_id not in valid_quest_ids:
             abort(404)
+
+        if not request_has_same_origin():
+            abort(403)
 
         completed_quest_ids.add(quest_id)
         return redirect(url_for("index"))
