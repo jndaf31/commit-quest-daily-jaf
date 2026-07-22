@@ -13,6 +13,14 @@ CREATE TABLE IF NOT EXISTS quest_completions (
 )
 """
 
+REQUIRED_COMPLETION_COLUMNS = {
+    "id",
+    "quest_id",
+    "completion_date",
+    "completed_at_utc",
+}
+REQUIRED_UNIQUE_COLUMNS = ("quest_id", "completion_date")
+
 
 def get_db() -> sqlite3.Connection:
     if "db" not in g:
@@ -37,15 +45,39 @@ def init_db() -> None:
     database.commit()
 
 
+def database_has_required_unique_constraint(database: sqlite3.Connection) -> bool:
+    indexes = database.execute("PRAGMA index_list(quest_completions)").fetchall()
+
+    for index in indexes:
+        if not index["unique"]:
+            continue
+
+        safe_index_name = index["name"].replace('"', '""')
+        index_columns = database.execute(
+            f'PRAGMA index_info("{safe_index_name}")'
+        ).fetchall()
+        column_names = tuple(column["name"] for column in index_columns)
+
+        if column_names == REQUIRED_UNIQUE_COLUMNS:
+            return True
+
+    return False
+
+
 def database_is_available() -> bool:
     try:
-        get_db().execute(
-            "SELECT id FROM quest_completions LIMIT 1"
-        ).fetchone()
+        database = get_db()
+        columns = database.execute(
+            "PRAGMA table_info(quest_completions)"
+        ).fetchall()
+        column_names = {column["name"] for column in columns}
+
+        return (
+            REQUIRED_COMPLETION_COLUMNS.issubset(column_names)
+            and database_has_required_unique_constraint(database)
+        )
     except sqlite3.Error:
         return False
-
-    return True
 
 
 def get_completed_quest_ids(completion_date: str) -> set[str]:

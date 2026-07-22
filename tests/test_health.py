@@ -15,6 +15,22 @@ def create_test_app(database_path: Path):
     )
 
 
+def replace_completion_table(database_path: Path, table_sql: str) -> None:
+    with sqlite3.connect(database_path) as database:
+        database.execute("DROP TABLE quest_completions")
+        database.execute(table_sql)
+        database.commit()
+
+
+def assert_health_is_unavailable(app) -> None:
+    response = app.test_client().get("/health")
+
+    assert response.status_code == 503
+    assert response.get_json() == {"status": "unavailable"}
+    assert b"health.db" not in response.data
+    assert b"quest_completions" not in response.data
+
+
 def test_health_returns_ok_when_database_is_available(tmp_path: Path) -> None:
     app = create_test_app(tmp_path / "health.db")
 
@@ -34,12 +50,47 @@ def test_health_returns_unavailable_when_application_table_is_missing(
         database.execute("DROP TABLE quest_completions")
         database.commit()
 
-    response = app.test_client().get("/health")
+    assert_health_is_unavailable(app)
 
-    assert response.status_code == 503
-    assert response.get_json() == {"status": "unavailable"}
-    assert b"health.db" not in response.data
-    assert b"quest_completions" not in response.data
+
+def test_health_returns_unavailable_when_required_column_is_missing(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "health.db"
+    app = create_test_app(database_path)
+    replace_completion_table(
+        database_path,
+        """
+        CREATE TABLE quest_completions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            quest_id TEXT NOT NULL,
+            completion_date TEXT NOT NULL,
+            UNIQUE (quest_id, completion_date)
+        )
+        """,
+    )
+
+    assert_health_is_unavailable(app)
+
+
+def test_health_returns_unavailable_when_unique_constraint_is_missing(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "health.db"
+    app = create_test_app(database_path)
+    replace_completion_table(
+        database_path,
+        """
+        CREATE TABLE quest_completions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            quest_id TEXT NOT NULL,
+            completion_date TEXT NOT NULL,
+            completed_at_utc TEXT NOT NULL
+        )
+        """,
+    )
+
+    assert_health_is_unavailable(app)
 
 
 def test_health_returns_non_sensitive_503_when_database_check_fails(
