@@ -58,8 +58,20 @@ def get_completion_counts() -> dict[str, int]:
     return {row["quest_id"]: row["completion_count"] for row in rows}
 
 
+def get_completion_history() -> list[sqlite3.Row]:
+    return get_db().execute(
+        """
+        SELECT quest_id, completion_date, completed_at_utc
+        FROM quest_completions
+        ORDER BY completion_date DESC, completed_at_utc ASC, id ASC
+        """
+    ).fetchall()
+
+
 def record_completion(
-    quest_id: str, completion_date: str, completed_at_utc: str
+    quest_id: str,
+    completion_date: str,
+    completed_at_utc: str,
 ) -> None:
     database = get_db()
     database.execute(
