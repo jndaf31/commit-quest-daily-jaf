@@ -16,7 +16,9 @@ A read-only `/history` page groups recognized completions by Lisbon date, shows 
 
 A read-only `/health` endpoint checks that the application can query SQLite. It returns `{"status": "ok"}` with HTTP 200 when healthy and a non-sensitive `{"status": "unavailable"}` with HTTP 503 when the database check fails.
 
-Deployment configuration and VPS deployment have not been added yet.
+The application can read its production SQLite path from the
+`COMMIT_QUEST_DATABASE` environment variable. Gunicorn is pinned as the
+production web server. VPS provisioning has not been performed yet.
 
 ## Initial scope
 
@@ -71,6 +73,31 @@ flask --app app:create_app run
 Then open `http://127.0.0.1:5000`. The health endpoint is available at `http://127.0.0.1:5000/health`.
 
 The development database is created automatically as `instance/commit-quest.db`. Flask's instance directory is ignored by Git and is intended for local runtime data rather than source code.
+
+## Production entry point
+
+Install the pinned production dependencies in a dedicated virtual environment:
+
+```bash
+python -m pip install -r requirements-prod.txt
+```
+
+Set `COMMIT_QUEST_DATABASE` to the persistent SQLite path outside the release
+directory, then start one Gunicorn worker on the loopback-only backend listener:
+
+```bash
+COMMIT_QUEST_DATABASE=/var/lib/commit-quest-daily/commit-quest.db \
+  gunicorn --bind 127.0.0.1:8001 --workers 1 --threads 2 \
+  --access-logfile - --error-logfile - --no-control-socket \
+  'app:create_app()'
+```
+
+Gunicorn remains in the foreground so a service manager can supervise it. Both
+logs go to standard output or standard error for capture by the service manager.
+The unused runtime control socket is disabled, so Gunicorn does not need another
+writable directory.
+The listener is intentionally local: a separate HTTPS reverse proxy provides
+the private user-facing connection.
 
 ## Development workflow
 
