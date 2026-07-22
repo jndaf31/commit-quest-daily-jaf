@@ -14,7 +14,9 @@ The server calculates lifetime XP, current level, and progress toward the next l
 
 A read-only `/history` page groups recognized completions by Lisbon date, shows newest days first, lists the completed quests, and calculates the XP earned on each day. Unknown historical quest IDs are ignored safely.
 
-Health monitoring, deployment configuration, and VPS deployment have not been added yet.
+A read-only `/health` endpoint checks that the application can query SQLite. It returns `{"status": "ok"}` with HTTP 200 when healthy and a non-sensitive `{"status": "unavailable"}` with HTTP 503 when the database check fails.
+
+Deployment configuration and VPS deployment have not been added yet.
 
 ## Initial scope
 
@@ -66,7 +68,7 @@ Run the development server:
 flask --app app:create_app run
 ```
 
-Then open `http://127.0.0.1:5000`.
+Then open `http://127.0.0.1:5000`. The health endpoint is available at `http://127.0.0.1:5000/health`.
 
 The development database is created automatically as `instance/commit-quest.db`. Flask's instance directory is ignored by Git and is intended for local runtime data rather than source code.
 
