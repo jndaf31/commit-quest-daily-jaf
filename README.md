@@ -10,9 +10,11 @@ The home page renders four fixed daily quests defined in Python. Each quest has 
 
 Quest completions are stored in SQLite. Each record contains a quest ID, a Europe/Lisbon completion date, and a UTC timestamp. A database uniqueness constraint ensures that each quest awards XP only once per Lisbon calendar day. Completion survives application restarts, while a new Lisbon day begins with an incomplete daily checklist.
 
-The server calculates total XP, current level, and progress toward the next level from today's stored records. State-changing forms require a same-origin request.
+The server calculates lifetime XP, current level, and progress toward the next level from all recognized stored completion records. State-changing forms require a same-origin request.
 
-History views, health monitoring, deployment configuration, and VPS deployment have not been added yet.
+A read-only `/history` page groups recognized completions by Lisbon date, shows newest days first, lists the completed quests, and calculates the XP earned on each day. Unknown historical quest IDs are ignored safely.
+
+Health monitoring, deployment configuration, and VPS deployment have not been added yet.
 
 ## Initial scope
 
