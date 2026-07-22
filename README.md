@@ -1,14 +1,16 @@
 # Commit Quest Daily Check-in
 
-A small mobile-first daily checklist inspired by Commit Quest. Completing daily tasks awards XP, builds a completion history, and persists progress in SQLite.
+A small mobile-first daily checklist inspired by Commit Quest. Completing daily tasks awards XP, builds a completion history, and will persist progress in SQLite.
 
-This application is being built as Phase 7 of João's VPS and networking mentorship. The first version will use Python, Flask, server-rendered HTML, minimal JavaScript, SQLite, and the Europe/Lisbon time zone.
+This application is being built as Phase 7 of João's VPS and networking mentorship. The first version uses Python, Flask, server-rendered HTML, minimal JavaScript, SQLite, and the Europe/Lisbon time zone.
 
 ## Current state
 
-The home page renders four fixed daily quests defined in Python. Each quest has a stable identifier, a title, and an XP reward. The current four quests total 100 XP per day.
+The home page renders four fixed daily quests defined in Python. Each quest has a stable identifier, a title, and an XP reward. The current four quests total 100 XP.
 
-Task completion, XP persistence, history, SQLite, health monitoring, and VPS deployment have not been added yet.
+Quests can now be completed through HTML forms. The server calculates total XP, current level, and progress toward the next level. Completion is temporarily held in a Python `set` inside the running Flask application, so it resets whenever the application process restarts or a new application instance is created.
+
+SQLite persistence, daily date boundaries, history, health monitoring, and VPS deployment have not been added yet.
 
 ## Initial scope
 
