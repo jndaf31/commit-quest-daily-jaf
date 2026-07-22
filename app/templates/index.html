@@ -11,13 +11,39 @@
     <section class="card" aria-labelledby="page-title">
       <p class="eyebrow">Phase 7</p>
       <h1 id="page-title">Commit Quest Daily Check-in</h1>
+
+      <dl class="progress-summary">
+        <div>
+          <dt>Level</dt>
+          <dd>{{ level }}</dd>
+        </div>
+        <div>
+          <dt>Total XP</dt>
+          <dd>{{ total_xp }}</dd>
+        </div>
+        <div>
+          <dt>Next level</dt>
+          <dd>{{ xp_progress }} / 100 XP</dd>
+        </div>
+      </dl>
+
       <p>Complete these four quests each day to earn 100 XP.</p>
 
       <ul class="quest-list">
         {% for quest in quests %}
-          <li class="quest-item">
-            <span class="quest-title">{{ quest.title }}</span>
-            <span class="quest-xp">{{ quest.xp }} XP</span>
+          <li class="quest-item{% if quest.id in completed_quest_ids %} quest-item--complete{% endif %}">
+            <div>
+              <span class="quest-title">{{ quest.title }}</span>
+              <span class="quest-xp">{{ quest.xp }} XP</span>
+            </div>
+
+            {% if quest.id in completed_quest_ids %}
+              <span class="completion-status">Completed</span>
+            {% else %}
+              <form method="post" action="{{ url_for('complete_quest', quest_id=quest.id) }}">
+                <button type="submit">Complete</button>
+              </form>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>
