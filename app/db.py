@@ -46,6 +46,18 @@ def get_completed_quest_ids(completion_date: str) -> set[str]:
     return {row["quest_id"] for row in rows}
 
 
+def get_completion_counts() -> dict[str, int]:
+    rows = get_db().execute(
+        """
+        SELECT quest_id, COUNT(*) AS completion_count
+        FROM quest_completions
+        GROUP BY quest_id
+        """
+    ).fetchall()
+
+    return {row["quest_id"]: row["completion_count"] for row in rows}
+
+
 def record_completion(
     quest_id: str, completion_date: str, completed_at_utc: str
 ) -> None:

@@ -6,7 +6,12 @@ from zoneinfo import ZoneInfo
 
 from flask import Flask, abort, current_app, redirect, render_template, request, url_for
 
-from app.db import get_completed_quest_ids, init_app as init_database, record_completion
+from app.db import (
+    get_completed_quest_ids,
+    get_completion_counts,
+    init_app as init_database,
+    record_completion,
+)
 from app.quests import QUESTS
 
 LISBON_TIME_ZONE = ZoneInfo("Europe/Lisbon")
@@ -18,7 +23,10 @@ def request_has_same_origin() -> bool:
     if origin is None:
         return False
 
-    parsed_origin = urlsplit(origin)
+    try:
+        parsed_origin = urlsplit(origin)
+    except ValueError:
+        return False
 
     return (
         parsed_origin.scheme in {"http", "https"}
@@ -52,8 +60,10 @@ def create_app(test_config: dict | None = None) -> Flask:
     def index() -> str:
         completion_date = current_lisbon_date()
         completed_quest_ids = get_completed_quest_ids(completion_date)
+        completion_counts = get_completion_counts()
         total_xp = sum(
-            quest["xp"] for quest in QUESTS if quest["id"] in completed_quest_ids
+            quest["xp"] * completion_counts.get(quest["id"], 0)
+            for quest in QUESTS
         )
         level = total_xp // 100 + 1
         xp_progress = total_xp % 100
