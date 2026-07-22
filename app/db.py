@@ -37,6 +37,15 @@ def init_db() -> None:
     database.commit()
 
 
+def database_is_available() -> bool:
+    try:
+        get_db().execute("SELECT 1").fetchone()
+    except sqlite3.Error:
+        return False
+
+    return True
+
+
 def get_completed_quest_ids(completion_date: str) -> set[str]:
     rows = get_db().execute(
         "SELECT quest_id FROM quest_completions WHERE completion_date = ?",
