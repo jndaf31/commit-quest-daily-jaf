@@ -39,7 +39,9 @@ def init_db() -> None:
 
 def database_is_available() -> bool:
     try:
-        get_db().execute("SELECT 1").fetchone()
+        get_db().execute(
+            "SELECT id FROM quest_completions LIMIT 1"
+        ).fetchone()
     except sqlite3.Error:
         return False
 
