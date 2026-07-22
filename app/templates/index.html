@@ -9,6 +9,11 @@
 <body>
   <main class="page-shell">
     <section class="card" aria-labelledby="page-title">
+      <nav class="page-nav" aria-label="Application navigation">
+        <a href="{{ url_for('index') }}" aria-current="page">Today</a>
+        <a href="{{ url_for('history') }}">History</a>
+      </nav>
+
       <p class="eyebrow">Phase 7</p>
       <h1 id="page-title">Commit Quest Daily Check-in</h1>
 
