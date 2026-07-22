@@ -126,6 +126,22 @@ def test_cross_origin_request_is_rejected_without_changing_xp(
     assert "Completed" not in page
 
 
+def test_malformed_origin_is_rejected_without_changing_xp(tmp_path: Path) -> None:
+    app = create_test_app(tmp_path / "test.db")
+    client = app.test_client()
+    quest = QUESTS[0]
+
+    response = client.post(
+        f'/quests/{quest["id"]}/complete',
+        headers={"Origin": "http://["},
+    )
+    page = client.get("/").get_data(as_text=True)
+
+    assert response.status_code == 403
+    assert f'<dd>{quest["xp"]}</dd>' not in page
+    assert "Completed" not in page
+
+
 def test_completing_all_quests_reaches_level_two(tmp_path: Path) -> None:
     app = create_test_app(tmp_path / "test.db")
     client = app.test_client()
@@ -177,6 +193,7 @@ def test_same_quest_can_be_completed_on_another_lisbon_date(
     second_client.post(
         f'/quests/{quest["id"]}/complete', headers=SAME_ORIGIN_HEADERS
     )
+    page_after_completion = second_client.get("/").get_data(as_text=True)
 
     with sqlite3.connect(database_path) as database:
         completion_dates = database.execute(
@@ -190,4 +207,7 @@ def test_same_quest_can_be_completed_on_another_lisbon_date(
         ).fetchall()
 
     assert "Completed" not in page_before_completion
+    assert f'<dd>{quest["xp"]}</dd>' in page_before_completion
+    assert "Completed" in page_after_completion
+    assert f'<dd>{quest["xp"] * 2}</dd>' in page_after_completion
     assert completion_dates == [("2026-07-22",), ("2026-07-23",)]
