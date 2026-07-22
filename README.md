@@ -48,11 +48,13 @@ Install the development dependencies:
 python -m pip install -r requirements-dev.txt
 ```
 
-Run the tests:
+Run the tests with the active Python interpreter:
 
 ```bash
-pytest
+python -m pytest
 ```
+
+The project also configures pytest so the shorter `pytest` command can import the local `app` package correctly.
 
 Run the development server:
 
