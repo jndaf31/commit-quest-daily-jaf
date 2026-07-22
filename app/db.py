@@ -49,7 +49,7 @@ def database_has_required_unique_constraint(database: sqlite3.Connection) -> boo
     indexes = database.execute("PRAGMA index_list(quest_completions)").fetchall()
 
     for index in indexes:
-        if not index["unique"]:
+        if not index["unique"] or index["partial"]:
             continue
 
         safe_index_name = index["name"].replace('"', '""')
