@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>History · Commit Quest Daily Check-in</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="card" aria-labelledby="page-title">
+      <nav class="page-nav" aria-label="Application navigation">
+        <a href="{{ url_for('index') }}">Today</a>
+        <a href="{{ url_for('history') }}" aria-current="page">History</a>
+      </nav>
+
+      <p class="eyebrow">Phase 7</p>
+      <h1 id="page-title">Completion history</h1>
+
+      {% if history_days %}
+        <div class="history-list">
+          {% for day in history_days %}
+            <section class="history-day" aria-labelledby="history-date-{{ loop.index }}">
+              <div class="history-day__heading">
+                <h2 id="history-date-{{ loop.index }}">{{ day.date }}</h2>
+                <strong>{{ day.total_xp }} XP</strong>
+              </div>
+
+              <ul class="history-quests">
+                {% for quest in day.quests %}
+                  <li>
+                    <span>{{ quest.title }}</span>
+                    <span>{{ quest.xp }} XP</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </section>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty-state">No completions have been recorded yet.</p>
+      {% endif %}
+    </section>
+  </main>
+</body>
+</html>
