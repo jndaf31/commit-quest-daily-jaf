@@ -93,6 +93,36 @@ def test_health_returns_unavailable_when_unique_constraint_is_missing(
     assert_health_is_unavailable(app)
 
 
+def test_health_returns_unavailable_for_partial_unique_index(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "health.db"
+    app = create_test_app(database_path)
+    replace_completion_table(
+        database_path,
+        """
+        CREATE TABLE quest_completions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            quest_id TEXT NOT NULL,
+            completion_date TEXT NOT NULL,
+            completed_at_utc TEXT NOT NULL
+        )
+        """,
+    )
+
+    with sqlite3.connect(database_path) as database:
+        database.execute(
+            """
+            CREATE UNIQUE INDEX partial_daily_completion
+            ON quest_completions (quest_id, completion_date)
+            WHERE quest_id = 'morning-water'
+            """
+        )
+        database.commit()
+
+    assert_health_is_unavailable(app)
+
+
 def test_health_returns_non_sensitive_503_when_database_check_fails(
     tmp_path: Path,
     monkeypatch,
