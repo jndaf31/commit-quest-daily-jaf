@@ -12,6 +12,16 @@ body {
   min-height: 100vh;
 }
 
+button {
+  min-height: 2.75rem;
+  padding: 0.625rem 1rem;
+  border: 1px solid currentColor;
+  border-radius: 0.625rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .page-shell {
   display: grid;
   min-height: 100vh;
@@ -39,6 +49,31 @@ h1 {
   line-height: 1;
 }
 
+.progress-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.progress-summary div {
+  padding: 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 0.75rem;
+}
+
+.progress-summary dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.progress-summary dd {
+  margin: 0.25rem 0 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
 .quest-list {
   display: grid;
   gap: 0.75rem;
@@ -48,13 +83,22 @@ h1 {
 }
 
 .quest-item {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid currentColor;
+  border-radius: 0.75rem;
+}
+
+.quest-item > div {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem;
-  border: 1px solid currentColor;
-  border-radius: 0.75rem;
+}
+
+.quest-item--complete {
+  opacity: 0.72;
 }
 
 .quest-title {
@@ -67,6 +111,16 @@ h1 {
   font-weight: 700;
 }
 
+.completion-status {
+  font-weight: 700;
+}
+
 p:last-child {
   margin-bottom: 0;
+}
+
+@media (max-width: 26rem) {
+  .progress-summary {
+    grid-template-columns: 1fr;
+  }
 }
