@@ -9,12 +9,14 @@ from flask import Flask, abort, current_app, redirect, render_template, request,
 from app.db import (
     get_completed_quest_ids,
     get_completion_counts,
+    get_completion_history,
     init_app as init_database,
     record_completion,
 )
 from app.quests import QUESTS
 
 LISBON_TIME_ZONE = ZoneInfo("Europe/Lisbon")
+QUESTS_BY_ID = {quest["id"]: quest for quest in QUESTS}
 
 
 def request_has_same_origin() -> bool:
@@ -41,6 +43,28 @@ def current_time() -> datetime:
 
 def current_lisbon_date() -> str:
     return current_time().astimezone(LISBON_TIME_ZONE).date().isoformat()
+
+
+def build_history_days() -> list[dict]:
+    history_days: list[dict] = []
+    days_by_date: dict[str, dict] = {}
+
+    for row in get_completion_history():
+        quest = QUESTS_BY_ID.get(row["quest_id"])
+        if quest is None:
+            continue
+
+        completion_date = row["completion_date"]
+        if completion_date not in days_by_date:
+            day = {"date": completion_date, "quests": [], "total_xp": 0}
+            days_by_date[completion_date] = day
+            history_days.append(day)
+
+        day = days_by_date[completion_date]
+        day["quests"].append(quest)
+        day["total_xp"] += quest["xp"]
+
+    return history_days
 
 
 def create_app(test_config: dict | None = None) -> Flask:
@@ -77,11 +101,13 @@ def create_app(test_config: dict | None = None) -> Flask:
             xp_progress=xp_progress,
         )
 
+    @app.get("/history")
+    def history() -> str:
+        return render_template("history.html", history_days=build_history_days())
+
     @app.post("/quests/<quest_id>/complete")
     def complete_quest(quest_id: str):
-        valid_quest_ids = {quest["id"] for quest in QUESTS}
-
-        if quest_id not in valid_quest_ids:
+        if quest_id not in QUESTS_BY_ID:
             abort(404)
 
         if not request_has_same_origin():
