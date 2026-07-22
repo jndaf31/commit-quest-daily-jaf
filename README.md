@@ -89,11 +89,14 @@ directory, then start one Gunicorn worker on the loopback-only backend listener:
 COMMIT_QUEST_DATABASE=/var/lib/commit-quest-daily/commit-quest.db \
   gunicorn --bind 127.0.0.1:8001 --workers 1 --threads 2 \
   --access-logfile - --error-logfile - --no-control-socket \
+  --access-logformat 'pid=%(p)s method=%(m)s path=%(U)s status=%(s)s bytes=%(B)s duration_seconds=%(L)s' \
   'app:create_app()'
 ```
 
 Gunicorn remains in the foreground so a service manager can supervise it. Both
 logs go to standard output or standard error for capture by the service manager.
+The access log uses compact `key=value` fields and avoids request bodies, query
+strings, database contents, and environment values.
 The unused runtime control socket is disabled, so Gunicorn does not need another
 writable directory.
 The listener is intentionally local: a separate HTTPS reverse proxy provides
