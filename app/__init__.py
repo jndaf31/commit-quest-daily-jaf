@@ -4,9 +4,10 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
-from flask import Flask, abort, current_app, redirect, render_template, request, url_for
+from flask import Flask, abort, current_app, jsonify, redirect, render_template, request, url_for
 
 from app.db import (
+    database_is_available,
     get_completed_quest_ids,
     get_completion_counts,
     get_completion_history,
@@ -104,6 +105,13 @@ def create_app(test_config: dict | None = None) -> Flask:
     @app.get("/history")
     def history() -> str:
         return render_template("history.html", history_days=build_history_days())
+
+    @app.get("/health")
+    def health():
+        if database_is_available():
+            return jsonify(status="ok"), 200
+
+        return jsonify(status="unavailable"), 503
 
     @app.post("/quests/<quest_id>/complete")
     def complete_quest(quest_id: str):
