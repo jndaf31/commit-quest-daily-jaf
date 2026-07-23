@@ -1,3 +1,4 @@
+import os
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,6 +19,15 @@ from app.quests import QUESTS
 
 LISBON_TIME_ZONE = ZoneInfo("Europe/Lisbon")
 QUESTS_BY_ID = {quest["id"]: quest for quest in QUESTS}
+
+
+def configured_database_path(default_path: Path) -> Path:
+    database_path = os.environ.get("COMMIT_QUEST_DATABASE")
+
+    if database_path is None:
+        return default_path
+
+    return Path(database_path)
 
 
 def request_has_same_origin() -> bool:
@@ -71,7 +81,9 @@ def build_history_days() -> list[dict]:
 def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        DATABASE=Path(app.instance_path) / "commit-quest.db",
+        DATABASE=configured_database_path(
+            Path(app.instance_path) / "commit-quest.db"
+        ),
         NOW_PROVIDER=lambda: datetime.now(UTC),
     )
 
