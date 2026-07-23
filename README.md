@@ -41,24 +41,27 @@ Full Commit Quest synchronization will be evaluated after the daily check-in app
 
 ## Local development
 
-Create a virtual environment:
+The verified primary development environment is an Apple silicon Mac using
+uv-managed Python 3.12. Create and activate the project-specific virtual
+environment:
 
 ```bash
-python3 -m venv .venv
+uv python install 3.12
+uv venv --python 3.12 .venv
 source .venv/bin/activate
 ```
 
-Install the development dependencies:
+Install the development dependencies and run the tests:
 
 ```bash
-python -m pip install -r requirements-dev.txt
-```
-
-Run the tests with the active Python interpreter:
-
-```bash
+uv pip install -r requirements-dev.txt
 python -m pytest
 ```
+
+The virtual environment remains the standard Python `.venv` layout, so editors
+and ordinary Python commands can use it without depending on uv at runtime.
+On another supported environment, the equivalent standard-library creation
+command is `python3 -m venv .venv`.
 
 The project also configures pytest so the shorter `pytest` command can import the local `app` package correctly.
 
