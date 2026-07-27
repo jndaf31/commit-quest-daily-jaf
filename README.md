@@ -16,9 +16,9 @@ A read-only `/history` page groups recognized completions by Lisbon date, shows 
 
 A read-only `/health` endpoint checks that the application can query SQLite. It returns `{"status": "ok"}` with HTTP 200 when healthy and a non-sensitive `{"status": "unavailable"}` with HTTP 503 when the database check fails.
 
-The application can read its production SQLite path from the
-`COMMIT_QUEST_DATABASE` environment variable. Gunicorn is pinned as the
-production web server. VPS provisioning has not been performed yet.
+Exact reviewed application commit `9163de1` runs on `pno-01` under a dedicated locked service account. Gunicorn listens only on `127.0.0.1:8001`, uses persistent SQLite state outside the immutable release, and is supervised by a hardened boot-enabled systemd service.
+
+The user-facing application is available at `https://quest.jndaf-learning-projects.com`. Caddy terminates publicly trusted HTTPS and requires HTTP Basic Authentication before proxying any application route to Gunicorn. The application itself still has no account or password system. The VPS mentorship repository is authoritative for the deployment, credential handling, monitoring, backup, and rollback model.
 
 ## Initial scope
 
@@ -28,12 +28,12 @@ production web server. VPS provisioning has not been performed yet.
 - Persistent completion history.
 - Mobile-first interface.
 - A small health endpoint for service monitoring.
-- Private deployment through Tailscale after the application is complete and reviewed.
+- Publicly reachable HTTPS with single-user authentication enforced by Caddy.
 
 ## Deliberately excluded from the first version
 
-- Public access.
-- User registration or passwords.
+- Unauthenticated public use.
+- Application-level registration, passwords, or account sessions.
 - Multiple accounts.
 - Third-party APIs.
 - Full synchronization with the original Commit Quest application.
@@ -102,8 +102,8 @@ The access log uses compact `key=value` fields and avoids request bodies, query
 strings, database contents, and environment values.
 The unused runtime control socket is disabled, so Gunicorn does not need another
 writable directory.
-The listener is intentionally local: a separate HTTPS reverse proxy provides
-the private user-facing connection.
+The listener is intentionally local: Caddy provides the authenticated public
+HTTPS boundary and proxies approved requests to Gunicorn.
 
 ## Development workflow
 
