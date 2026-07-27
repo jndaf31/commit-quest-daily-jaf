@@ -16,9 +16,9 @@ The VPS mentorship repository `jndaf31/vps-learning-project-jaf` remains the sol
 - One user and a fixed daily checklist.
 - Each task awards XP at most once per calendar day.
 - Completion history and a non-sensitive health endpoint.
-- Private Tailscale-only deployment after local application work is complete.
+- Authenticated public HTTPS through Caddy at `quest.jndaf-learning-projects.com`, with Gunicorn remaining loopback-only.
 
-Do not add public authentication, registration, multiple accounts, third-party APIs, containers, automated deployment, or full Commit Quest synchronization unless a later approved issue explicitly introduces them.
+Do not add application-level authentication, registration, multiple accounts, third-party APIs, containers, automated deployment, or full Commit Quest synchronization unless a later approved issue explicitly introduces them. The first deployment uses Caddy HTTP Basic Authentication as an infrastructure boundary; the VPS mentorship repository defines and records that configuration.
 
 ## Teaching and implementation rules
 
@@ -47,8 +47,9 @@ Do not add public authentication, registration, multiple accounts, third-party A
 - Use POST for state changes and GET for read-only views.
 - Enforce the once-per-task-per-day XP rule in the database, not only in the interface.
 - Do not expose stack traces, filesystem paths, database contents, or sensitive configuration through the health endpoint.
-- Do not request or record passwords, tokens, private keys, or recovery codes.
+- Do not request or record passwords, tokens, private keys, password hashes, or recovery codes.
 - Keep persistent application state outside the deployed code directory in production.
+- Keep the public authentication boundary in Caddy until an explicitly approved application issue replaces it; do not assume same-origin checking authenticates a user.
 
 ## Definition of done for a feature
 
